@@ -13,3 +13,4 @@ python-decouple==3.8
 psycopg2-binary==2.9.7
 drf-spectacular==0.26.5
 gunicorn==22.0.0
+whitenoise==6.6.0
