@@ -157,7 +157,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # Additional locations of static files
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
-]
+] if (BASE_DIR / 'static').exists() else []
 
 # Static files finders
 STATICFILES_FINDERS = [
