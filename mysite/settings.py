@@ -21,12 +21,33 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&uf(2bphvhnf4jq@fc_^=5nyepk+e7&eu%#=augx0ll$gro_6o'
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-&uf(2bphvhnf4jq@fc_^=5nyepk+e7&eu%#=augx0ll$gro_6o')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0').split(',')
+def _split_csv(value: str) -> list[str]:
+    """Split comma-separated values and strip whitespace."""
+    return [item.strip() for item in value.split(",") if item.strip()]
+
+ALLOWED_HOSTS = _split_csv(config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0'))
+
+# CSRF Configuration
+_raw_csrf = config('CSRF_TRUSTED_ORIGINS', default='')
+_csrf_items = _split_csv(_raw_csrf)
+
+def _ensure_scheme(origin: str) -> str:
+    """Ensure CSRF trusted origins have proper scheme."""
+    if origin.startswith("http://") or origin.startswith("https://"):
+        return origin
+    # Default to https; change to http if your setup requires it
+    return f"https://{origin}"
+
+CSRF_TRUSTED_ORIGINS = [_ensure_scheme(origin) for origin in _csrf_items]
+
+# Proxy settings for production deployment
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Application definition
@@ -166,13 +187,14 @@ TINYMCE_DEFAULT_CONFIG = {
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication',  # Agregar esta línea
+        'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20
+    'PAGE_SIZE': 20,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 # Media files
@@ -221,19 +243,6 @@ SPECTACULAR_SETTINGS = {
     'AUTHENTICATION_WHITELIST': [
         'rest_framework.authentication.TokenAuthentication',
     ],
-}
-
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20,
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 # Configuración para Docker
