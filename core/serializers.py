@@ -9,7 +9,7 @@ class UserLoginSerializer(serializers.Serializer):
     Serializer for user login authentication.
     """
     username = serializers.CharField()
-    password = serializers.CharField()
+    password = serializers.CharField(style={'input_type': 'password'})
     
     def validate(self, data):
         username = data.get('username')
@@ -32,8 +32,15 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     """
     Serializer for user registration with password confirmation.
     """
-    password = serializers.CharField(write_only=True, min_length=8)
-    password_confirm = serializers.CharField(write_only=True)
+    password = serializers.CharField(
+        write_only=True, 
+        min_length=8,
+        style={'input_type': 'password'}
+    )
+    password_confirm = serializers.CharField(
+        write_only=True,
+        style={'input_type': 'password'}
+    )
     
     class Meta:
         model = User
