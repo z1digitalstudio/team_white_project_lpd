@@ -6,17 +6,13 @@ class IsOwnerOrSuperuser(permissions.BasePermission):
     Any authenticated user can view, but only owners can modify/delete.
     """
     def has_permission(self, request, view):
-        # Any authenticated user can view the list
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        
-        # Only authenticated users can create/modify/delete
+        # All operations require authentication
         return request.user.is_authenticated
     
     def has_object_permission(self, request, view, obj):
-        # Anyone can view (GET)
+        # Authenticated users can view (GET)
         if request.method in permissions.SAFE_METHODS:
-            return True
+            return request.user.is_authenticated
         
         # Only owner or superuser can modify/delete
         if request.user.is_superuser:
@@ -30,17 +26,13 @@ class IsOwnerOrSuperuserForBlog(permissions.BasePermission):
     Any authenticated user can view, but only owners can modify/delete.
     """
     def has_permission(self, request, view):
-        # Any authenticated user can view the list
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        
-        # Only authenticated users can create/modify/delete
+        # All operations require authentication
         return request.user.is_authenticated
     
     def has_object_permission(self, request, view, obj):
-        # Anyone can view (GET)
+        # Authenticated users can view (GET)
         if request.method in permissions.SAFE_METHODS:
-            return True
+            return request.user.is_authenticated
         
         # Only owner or superuser can modify/delete
         if request.user.is_superuser:
