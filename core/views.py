@@ -78,6 +78,26 @@ class BlogViewSet(viewsets.ModelViewSet):
             return Blog.objects.all()
         return Blog.objects.filter(user=self.request.user)
     
+    def create(self, request, *args, **kwargs):
+        """
+        Create a blog. Each user can only have one blog.
+        """
+        # Check if user already has a blog
+        if hasattr(request.user, 'blog'):
+            return Response(
+                {
+                    'error': 'User already has a blog',
+                    'message': 'Each user can only have one blog. Use PUT or PATCH to update your existing blog.',
+                    'existing_blog_id': request.user.blog.id,
+                    'existing_blog_url': request.build_absolute_uri(
+                        reverse('blog-detail', kwargs={'pk': request.user.blog.id})
+                    )
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        return super().create(request, *args, **kwargs)
+    
     def perform_create(self, serializer):
         # Automatically assign user to blog
         serializer.save(user=self.request.user)
