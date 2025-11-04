@@ -2,6 +2,7 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
 from django.db.models import Q
@@ -12,6 +13,14 @@ from .serializers import (
     PostCreateSerializer, TagSerializer, UserRegistrationSerializer, UserLoginSerializer
 )
 from .permissions import IsOwnerOrSuperuser, IsOwnerOrSuperuserForBlog, IsSuperuserOrReadOnly
+
+class PostPagination(PageNumberPagination):
+    """
+    Custom pagination for posts - 5 items per page.
+    """
+    page_size = 5
+    page_size_query_param = 'page_size'
+    max_page_size = 100
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -114,8 +123,10 @@ class TagViewSet(viewsets.ModelViewSet):
 class PostViewSet(viewsets.ModelViewSet):
     """
     ViewSet for post management with custom permissions and actions.
+    Posts are paginated with 5 items per page.
     """
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrSuperuser]
+    pagination_class = PostPagination
     
     def get_queryset(self):
         # Any authenticated user can see all posts
@@ -143,22 +154,31 @@ class PostViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def published(self, request):
         """
-        Endpoint to get only published posts.
+        Endpoint to get only published posts (paginated, 5 per page).
         """
         posts = self.get_queryset().filter(is_published=True)
+        page = self.paginate_queryset(posts)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(posts, many=True)
         return Response(serializer.data)
     
     @action(detail=False, methods=['get'])
     def by_tag(self, request):
         """
-        Endpoint to filter posts by tag name.
+        Endpoint to filter posts by tag name (paginated, 5 per page).
         """
         tag_name = request.query_params.get('tag', None)
         if tag_name:
             posts = self.get_queryset().filter(tags__name__icontains=tag_name)
         else:
             posts = self.get_queryset()
+        
+        page = self.paginate_queryset(posts)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(posts, many=True)
         return Response(serializer.data)
 

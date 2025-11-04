@@ -31,6 +31,7 @@ class UserLoginSerializer(serializers.Serializer):
 class UserRegistrationSerializer(serializers.ModelSerializer):
     """
     Serializer for user registration with password confirmation.
+    Username can only contain letters and numbers (no special characters).
     """
     password = serializers.CharField(
         write_only=True, 
@@ -45,6 +46,18 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username', 'email', 'first_name', 'last_name', 'password', 'password_confirm']
+    
+    def validate_username(self, value):
+        """
+        Validate that username contains only letters and numbers.
+        """
+        import re
+        # Only allow alphanumeric characters (letters and numbers)
+        if not re.match(r'^[a-zA-Z0-9]+$', value):
+            raise serializers.ValidationError(
+                "Username can only contain letters and numbers. No special characters allowed."
+            )
+        return value
     
     def validate(self, data):
         # Check if passwords match
