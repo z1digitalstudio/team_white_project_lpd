@@ -14,6 +14,7 @@ class Blog(models.Model):
     title = models.CharField(max_length=200)
     bio = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-created_at']  # Ordenar por fecha de creación descendente
@@ -28,9 +29,11 @@ class Tag(models.Model):
     Tags can be shared across multiple posts (ManyToMany relationship).
     """
     name = models.CharField(max_length=50, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['name']  # Ordenar por nombre alfabéticamente
+        ordering = ['-created_at', 'name']  # Ordenar por fecha de creación descendente y nombre alfabéticamente
 
     def __str__(self):
         return self.name
