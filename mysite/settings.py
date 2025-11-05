@@ -260,8 +260,3 @@ SPECTACULAR_SETTINGS = {
         'rest_framework.authentication.TokenAuthentication',
     ],
 }
-
-# Configuración para Docker
-if os.environ.get('DATABASE_URL'):
-    import dj_database_url
-    DATABASES['default'] = dj_database_url.parse(os.environ.get('DATABASE_URL'))
