@@ -33,7 +33,7 @@ class Tag(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['name']  # Temporalmente solo por nombre hasta aplicar migraciones, luego volver a ['-created_at', 'name']
+        ordering = ['-created_at', 'name']  # Ordenar por fecha de creación descendente y nombre alfabéticamente
 
     def __str__(self):
         return self.name
