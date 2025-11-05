@@ -1,2 +1,2 @@
-release: echo "Starting release phase..." && python manage.py migrate --noinput && echo "Migrations completed successfully" && python manage.py collectstatic --noinput && echo "Static files collected"
-web: gunicorn mysite.wsgi:application --bind 0.0.0.0:$PORT --workers 3
+release: python manage.py collectstatic --noinput
+web: python manage.py migrate --noinput && gunicorn mysite.wsgi:application --bind 0.0.0.0:$PORT --workers 3
