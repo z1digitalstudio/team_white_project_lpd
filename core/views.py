@@ -13,6 +13,15 @@ from .serializers import (
     PostCreateSerializer, TagSerializer, UserRegistrationSerializer, UserLoginSerializer
 )
 from .permissions import IsOwnerOrSuperuser, IsOwnerOrSuperuserForBlog, IsSuperuserOrReadOnly
+from .constants import (
+    USER_REGISTERED_SUCCESS,
+    LOGIN_SUCCESS,
+    USER_ALREADY_HAS_BLOG,
+    BLOG_ONE_PER_USER_MESSAGE,
+    BLOG_TITLE_TEMPLATE,
+    ERROR_KEY,
+    MESSAGE_KEY,
+)
 
 class PostPagination(PageNumberPagination):
     """
@@ -47,14 +56,14 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
             # Automatically create blog for new user
             Blog.objects.create(
                 user=user,
-                title=f"Blog de {user.username}"
+                title=BLOG_TITLE_TEMPLATE.format(username=user.username)
             )
             # Create token for user
             token, created = Token.objects.get_or_create(user=user)
             return Response({
                 'user': UserSerializer(user).data,
                 'token': token.key,
-                'message': 'User registered successfully'
+                MESSAGE_KEY: USER_REGISTERED_SUCCESS
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -70,7 +79,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
             return Response({
                 'user': UserSerializer(user).data,
                 'token': token.key,
-                'message': 'Login successful'
+                MESSAGE_KEY: LOGIN_SUCCESS
             })
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -95,8 +104,8 @@ class BlogViewSet(viewsets.ModelViewSet):
         if hasattr(request.user, 'blog'):
             return Response(
                 {
-                    'error': 'User already has a blog',
-                    'message': 'Each user can only have one blog. Use PUT or PATCH to update your existing blog.',
+                    ERROR_KEY: USER_ALREADY_HAS_BLOG,
+                    MESSAGE_KEY: BLOG_ONE_PER_USER_MESSAGE,
                     'existing_blog_id': request.user.blog.id,
                     'existing_blog_url': request.build_absolute_uri(
                         reverse('blog-detail', kwargs={'pk': request.user.blog.id})
@@ -147,7 +156,7 @@ class PostViewSet(viewsets.ModelViewSet):
             # Create blog automatically if it doesn't exist
             blog = Blog.objects.create(
                 user=self.request.user,
-                title=f"Blog de {self.request.user.username}"
+                title=BLOG_TITLE_TEMPLATE.format(username=self.request.user.username)
             )
             serializer.save(blog=blog)
     

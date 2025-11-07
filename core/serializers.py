@@ -2,6 +2,13 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from .models import Blog, Post, Tag
+from .constants import (
+    USER_ACCOUNT_DISABLED,
+    INVALID_CREDENTIALS,
+    MUST_PROVIDE_CREDENTIALS,
+    USERNAME_ALPHANUMERIC_ONLY,
+    PASSWORDS_DO_NOT_MATCH,
+)
 
 
 class UserLoginSerializer(serializers.Serializer):
@@ -22,11 +29,11 @@ class UserLoginSerializer(serializers.Serializer):
                     data['user'] = user
                     return data
                 else:
-                    raise serializers.ValidationError("User account is disabled")
+                    raise serializers.ValidationError(USER_ACCOUNT_DISABLED)
             else:
-                raise serializers.ValidationError("Invalid credentials")
+                raise serializers.ValidationError(INVALID_CREDENTIALS)
         else:
-            raise serializers.ValidationError("Must provide username and password")
+            raise serializers.ValidationError(MUST_PROVIDE_CREDENTIALS)
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     """
@@ -54,15 +61,13 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         import re
         # Only allow alphanumeric characters (letters and numbers)
         if not re.match(r'^[a-zA-Z0-9]+$', value):
-            raise serializers.ValidationError(
-                "Username can only contain letters and numbers. No special characters allowed."
-            )
+            raise serializers.ValidationError(USERNAME_ALPHANUMERIC_ONLY)
         return value
     
     def validate(self, data):
         # Check if passwords match
         if data['password'] != data['password_confirm']:
-            raise serializers.ValidationError("Passwords do not match")
+            raise serializers.ValidationError(PASSWORDS_DO_NOT_MATCH)
         return data
     
     def create(self, validated_data):
