@@ -5,50 +5,6 @@ Permite a cada usuario tener su propio blog, crear publicaciones con un editor e
 
 ---
 
-## 🚀 Estado actual del proyecto
-
-### ✅ **Configuración completada**
-- Proyecto base Django (`mysite`)
-- Aplicación principal (`core`)
-- Entorno virtual listo para desarrollo
-- Módulos instalados y migraciones aplicadas
-- Superusuario creado y acceso al panel de administración habilitado
-
-### ✅ **Integraciones implementadas**
-- **TinyMCE** para edición enriquecida de posts
-- **Django Import-Export** para gestionar contenido desde el admin
-- Configuración de **MEDIA_URL** y **MEDIA_ROOT** para imágenes
-- Panel personalizado: cada usuario gestiona solo su propio blog y posts
-
-### ✅ **Modelos implementados**
-#### `Blog`
-Cada usuario tiene un blog con:
-- `title`: título del blog
-- `bio`: descripción o biografía
-- `user`: relación OneToOne con el usuario
-
-#### `Tag`
-Sistema de etiquetas reutilizables.
-
-#### `Post`
-- `title`, `slug`, `content`, `excerpt`, `cover`, `tags`
-- Campos de control: `is_published`, `created_at`, `updated_at`, `published_at`
-- Relación con `Blog`
-
-### ✅ **Panel de administración**
-- Integración con TinyMCE
-- Filtros y búsquedas personalizadas
-- Los usuarios solo ven y editan su propio contenido (no superusuarios)
-
-### ✅ **Frontend actual**
-- `/blog/` → lista de posts publicados
-- `/blog/<slug>/` → detalle completo de un post
-- Templates:  
-  - `post_list.html`
-  - `post_detail.html`
-
----
-
 ## ⚙️ **Instalación y ejecución local**
 
 <details>
