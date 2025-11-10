@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils.text import slugify
+from django.utils import timezone
 from tinymce.models import HTMLField
 
 User = settings.AUTH_USER_MODEL
@@ -43,6 +44,12 @@ class Post(models.Model):
     """
     Post model representing a blog post.
     Each post belongs to a blog and can have multiple tags.
+    
+    Publishing behavior:
+    - is_published: Boolean flag indicating if the post is published and visible.
+    - published_at: DateTime automatically set when is_published changes to True
+                    for the first time. Maintains the original publication date
+                    if the post is unpublished and republished later.
     """
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name='posts')
     title = models.CharField(max_length=250)
@@ -61,9 +68,10 @@ class Post(models.Model):
 
     def save(self, *args, **kwargs):
         """
-        Override save method to automatically generate slug from title.
-        If slug already exists, append a number to make it unique.
+        Override save method to automatically generate slug from title
+        and update published_at when post is published for the first time.
         """
+        # Generate slug if not provided
         if not self.slug:
             self.slug = slugify(self.title)
             # If slug already exists, add a number
@@ -72,6 +80,13 @@ class Post(models.Model):
             while Post.objects.filter(slug=self.slug).exists():
                 self.slug = f"{original_slug}-{counter}"
                 counter += 1
+        
+        # Update published_at when post is published for the first time
+        if self.is_published and not self.published_at:
+            # If publishing for the first time, set published_at to now
+            self.published_at = timezone.now()
+        # If unpublishing, keep published_at (maintains publication history)
+        
         super().save(*args, **kwargs)
 
     def __str__(self):
