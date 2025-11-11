@@ -222,6 +222,85 @@ pip install -r requirements.txt
 
 ---
 
+## 🌿 GitFlow - Flujo de trabajo
+
+Este proyecto sigue el flujo de trabajo **GitFlow** para mantener un historial de commits organizado y facilitar la colaboración.
+
+### Ramas principales
+
+- **`main`**: Rama de producción. Solo recibe código estable mediante releases.
+- **`develop`**: Rama de desarrollo. Contiene el código más reciente y estable para desarrollo.
+
+### Flujo de trabajo
+
+#### 1. Crear una nueva feature
+
+```bash
+# Asegúrate de estar en develop y actualizado
+git checkout develop
+git pull origin develop
+
+# Crea una nueva rama feature
+git checkout -b feature/nombre-de-la-feature
+
+# Trabaja en tu feature, haz commits...
+git add .
+git commit -m "feat: descripción del cambio"
+
+# Sube la rama
+git push origin feature/nombre-de-la-feature
+```
+
+#### 2. Crear Pull Request
+
+1. Ve a GitHub y crea una **Pull Request** desde `feature/nombre-de-la-feature` hacia `develop`.
+2. Completa el template de PR con:
+   - Ticket/Issue relacionado
+   - Descripción de los cambios
+   - Plan de testing
+3. Asigna reviewers si es necesario.
+
+#### 3. Mergear a develop
+
+- **Usa SQUASH** al mergear feature branches a `develop`.
+- Esto mantiene el historial limpio con un solo commit por feature.
+
+#### 4. Release a main
+
+Cuando `develop` esté listo para producción:
+
+```bash
+# Crear rama release (opcional) o mergear directamente
+git checkout main
+git pull origin main
+git merge develop  # Usa MERGE COMMIT (no squash)
+git push origin main
+```
+
+### Convenciones de commits
+
+Seguimos **Conventional Commits**:
+
+- `feat:` Nueva funcionalidad
+- `fix:` Corrección de bug
+- `refactor:` Refactorización de código
+- `docs:` Cambios en documentación
+- `test:` Añadir o modificar tests
+- `chore:` Tareas de mantenimiento
+
+**Ejemplo:**
+```bash
+git commit -m "feat: add user registration endpoint"
+git commit -m "fix: resolve 500 error on blog creation"
+```
+
+### Referencias
+
+- [GitFlow Cheat Sheet](https://danielkummer.github.io/git-flow-cheatsheet/index.es_ES.html)
+- [Git Rebase vs Merge vs Squash](https://dev.to/devsatasurion/git-rebase-vs-merge-vs-squash-how-to-choose-the-right-one-3a33)
+
+---
+
 ## 💡 Autor
 
 **👤 Luis Paradela**  
