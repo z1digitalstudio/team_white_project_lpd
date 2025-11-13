@@ -167,13 +167,29 @@ class PostViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def by_tag(self, request):
         """
-        Endpoint to filter posts by tag name (paginated, 5 per page).
+        Endpoint to filter posts by tag name or ID (paginated, 5 per page).
+        Accepts either tag name or tag ID as query parameter.
         """
-        tag_name = request.query_params.get('tag', None)
-        if tag_name:
-            posts = self.get_queryset().filter(tags__name__icontains=tag_name)
+        tag_param = request.query_params.get('tag', None)
+        queryset = self.get_queryset()
+        
+        if tag_param:
+            tag_param = tag_param.strip()  # Remove whitespace
+            # Try to filter by ID first (if it's a number)
+            try:
+                tag_id = int(tag_param)
+                posts = queryset.filter(tags__id=tag_id).distinct()
+            except ValueError:
+                # If not a number, filter by name (case-insensitive, exact match first)
+                # Try exact match first
+                exact_posts = queryset.filter(tags__name__iexact=tag_param).distinct()
+                if exact_posts.exists():
+                    posts = exact_posts
+                else:
+                    # Fall back to contains if no exact match
+                    posts = queryset.filter(tags__name__icontains=tag_param).distinct()
         else:
-            posts = self.get_queryset()
+            posts = queryset
         
         page = self.paginate_queryset(posts)
         if page is not None:
