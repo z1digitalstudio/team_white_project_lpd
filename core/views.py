@@ -12,7 +12,7 @@ from .serializers import (
     UserSerializer, BlogSerializer, PostSerializer, 
     PostCreateSerializer, TagSerializer, UserRegistrationSerializer, UserLoginSerializer
 )
-from .permissions import IsOwnerOrSuperuser, IsOwnerOrSuperuserForBlog, IsSuperuserOrReadOnly
+from .permissions import HasPostPermission, HasBlogPermission, IsSuperuserOrReadOnly
 
 class PostPagination(PageNumberPagination):
     """
@@ -79,7 +79,7 @@ class BlogViewSet(viewsets.ModelViewSet):
     ViewSet for blog management with owner-based permissions.
     """
     serializer_class = BlogSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrSuperuserForBlog]
+    permission_classes = [permissions.IsAuthenticated, HasBlogPermission]
     
     def get_queryset(self):
         # Superusers can see all blogs, others only their own
@@ -125,7 +125,7 @@ class PostViewSet(viewsets.ModelViewSet):
     ViewSet for post management with custom permissions and actions.
     Posts are paginated with 5 items per page.
     """
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrSuperuser]
+    permission_classes = [permissions.IsAuthenticated, HasPostPermission]
     pagination_class = PostPagination
     
     def get_queryset(self):
