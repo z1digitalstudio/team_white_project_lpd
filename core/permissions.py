@@ -1,7 +1,6 @@
 from rest_framework import permissions
 
 
-
 class BaseOwnerPermission(permissions.BasePermission):
     """
     Base permission class for owner-based permissions.

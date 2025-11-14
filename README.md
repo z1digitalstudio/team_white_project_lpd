@@ -5,50 +5,6 @@ Permite a cada usuario tener su propio blog, crear publicaciones con un editor e
 
 ---
 
-## 🚀 Estado actual del proyecto
-
-### ✅ **Configuración completada**
-- Proyecto base Django (`mysite`)
-- Aplicación principal (`core`)
-- Entorno virtual listo para desarrollo
-- Módulos instalados y migraciones aplicadas
-- Superusuario creado y acceso al panel de administración habilitado
-
-### ✅ **Integraciones implementadas**
-- **TinyMCE** para edición enriquecida de posts
-- **Django Import-Export** para gestionar contenido desde el admin
-- Configuración de **MEDIA_URL** y **MEDIA_ROOT** para imágenes
-- Panel personalizado: cada usuario gestiona solo su propio blog y posts
-
-### ✅ **Modelos implementados**
-#### `Blog`
-Cada usuario tiene un blog con:
-- `title`: título del blog
-- `bio`: descripción o biografía
-- `user`: relación OneToOne con el usuario
-
-#### `Tag`
-Sistema de etiquetas reutilizables.
-
-#### `Post`
-- `title`, `slug`, `content`, `excerpt`, `cover`, `tags`
-- Campos de control: `is_published`, `created_at`, `updated_at`, `published_at`
-- Relación con `Blog`
-
-### ✅ **Panel de administración**
-- Integración con TinyMCE
-- Filtros y búsquedas personalizadas
-- Los usuarios solo ven y editan su propio contenido (no superusuarios)
-
-### ✅ **Frontend actual**
-- `/blog/` → lista de posts publicados
-- `/blog/<slug>/` → detalle completo de un post
-- Templates:  
-  - `post_list.html`
-  - `post_detail.html`
-
----
-
 ## ⚙️ **Instalación y ejecución local**
 
 <details>
@@ -263,6 +219,85 @@ pip install -r requirements.txt
 
 - [ ] Implementar API REST con Django REST Framework
 - [ ] Preparar para despliegue en Render / Railway / Vercel
+
+---
+
+## 🌿 GitFlow - Flujo de trabajo
+
+Este proyecto sigue el flujo de trabajo **GitFlow** para mantener un historial de commits organizado y facilitar la colaboración.
+
+### Ramas principales
+
+- **`main`**: Rama de producción. Solo recibe código estable mediante releases.
+- **`develop`**: Rama de desarrollo. Contiene el código más reciente y estable para desarrollo.
+
+### Flujo de trabajo
+
+#### 1. Crear una nueva feature
+
+```bash
+# Asegúrate de estar en develop y actualizado
+git checkout develop
+git pull origin develop
+
+# Crea una nueva rama feature
+git checkout -b feature/nombre-de-la-feature
+
+# Trabaja en tu feature, haz commits...
+git add .
+git commit -m "feat: descripción del cambio"
+
+# Sube la rama
+git push origin feature/nombre-de-la-feature
+```
+
+#### 2. Crear Pull Request
+
+1. Ve a GitHub y crea una **Pull Request** desde `feature/nombre-de-la-feature` hacia `develop`.
+2. Completa el template de PR con:
+   - Ticket/Issue relacionado
+   - Descripción de los cambios
+   - Plan de testing
+3. Asigna reviewers si es necesario.
+
+#### 3. Mergear a develop
+
+- **Usa SQUASH** al mergear feature branches a `develop`.
+- Esto mantiene el historial limpio con un solo commit por feature.
+
+#### 4. Release a main
+
+Cuando `develop` esté listo para producción:
+
+```bash
+# Crear rama release (opcional) o mergear directamente
+git checkout main
+git pull origin main
+git merge develop  # Usa MERGE COMMIT (no squash)
+git push origin main
+```
+
+### Convenciones de commits
+
+Seguimos **Conventional Commits**:
+
+- `feat:` Nueva funcionalidad
+- `fix:` Corrección de bug
+- `refactor:` Refactorización de código
+- `docs:` Cambios en documentación
+- `test:` Añadir o modificar tests
+- `chore:` Tareas de mantenimiento
+
+**Ejemplo:**
+```bash
+git commit -m "feat: add user registration endpoint"
+git commit -m "fix: resolve 500 error on blog creation"
+```
+
+### Referencias
+
+- [GitFlow Cheat Sheet](https://danielkummer.github.io/git-flow-cheatsheet/index.es_ES.html)
+- [Git Rebase vs Merge vs Squash](https://dev.to/devsatasurion/git-rebase-vs-merge-vs-squash-how-to-choose-the-right-one-3a33)
 
 ---
 
