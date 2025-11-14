@@ -5,7 +5,7 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from ..models import Blog, Post, Tag
-from ..permissions import IsOwnerOrSuperuser, IsOwnerOrSuperuserForBlog, IsSuperuserOrReadOnly
+from ..permissions import HasPostPermission, HasBlogPermission, IsSuperuserOrReadOnly
 
 class PermissionTest(APITestCase):
     """Test permission system"""
