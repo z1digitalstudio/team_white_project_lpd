@@ -29,14 +29,13 @@ class UserLoginSerializer(serializers.Serializer):
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     """
-    Serializer for user registration with password confirmation and blog title.
+    Serializer for user registration with password confirmation.
     All fields have length validations:
     - Username: 3-30 characters (letters and numbers only)
     - Password: 8-128 characters
     - First name: 2-150 characters (required)
     - Last name: 2-150 characters (optional)
-    - Email: 5-254 characters (required)
-    - Blog title: 1-200 characters (required)
+    - Email: 5-150 characters (required)
     """
     password = serializers.CharField(
         write_only=True, 
@@ -66,17 +65,10 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         min_length=2,
         max_length=150
     )
-    blog_title = serializers.CharField(
-        required=True,
-        allow_blank=False,
-        min_length=1,
-        max_length=200,
-        help_text="Title for the user's blog"
-    )
     
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'last_name', 'password', 'password_confirm', 'blog_title']
+        fields = ['username', 'email', 'first_name', 'last_name', 'password', 'password_confirm']
         extra_kwargs = {
             'username': {'min_length': 3, 'max_length': 30},
             'email': {'required': True},
@@ -111,8 +103,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         value = value.strip()
         if len(value) < 5:
             raise serializers.ValidationError("Email must be at least 5 characters long.")
-        if len(value) > 254:
-            raise serializers.ValidationError("Email cannot exceed 254 characters.")
+        if len(value) > 150:
+            raise serializers.ValidationError("Email cannot exceed 150 characters.")
         return value
     
     def validate_first_name(self, value):
@@ -150,19 +142,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Password cannot exceed 128 characters.")
         return value
     
-    def validate_blog_title(self, value):
-        """
-        Validate that blog title is provided, not empty, and has valid length.
-        """
-        if not value or not value.strip():
-            raise serializers.ValidationError("Blog title is required and cannot be empty.")
-        value = value.strip()
-        if len(value) < 1:
-            raise serializers.ValidationError("Blog title must be at least 1 character long.")
-        if len(value) > 200:
-            raise serializers.ValidationError("Blog title cannot exceed 200 characters.")
-        return value
-    
     def validate(self, data):
         # Check if passwords match
         if data['password'] != data['password_confirm']:
@@ -170,13 +149,9 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return data
     
     def create(self, validated_data):
-        # Extract blog_title before creating user
-        blog_title = validated_data.pop('blog_title')
         # Remove password_confirm before creating user
         validated_data.pop('password_confirm')
         user = User.objects.create_user(**validated_data)
-        # Store blog_title in user instance for later use in view
-        user._blog_title = blog_title
         return user
 
 class UserSerializer(serializers.ModelSerializer):
