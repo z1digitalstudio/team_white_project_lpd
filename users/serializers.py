@@ -76,9 +76,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'username': {'min_length': 3, 'max_length': 30, 'required': True},
             'email': {'required': True},
-            'first_name': {'required': True},
-            'password': {'write_only': True, 'required': True},
-            'password_confirm': {'write_only': True, 'required': True}
+            'first_name': {'required': True}
         }
     
     def validate_username(self, value):
