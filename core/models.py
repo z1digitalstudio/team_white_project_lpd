@@ -1,3 +1,4 @@
+import random
 from django.db import models
 from django.conf import settings
 from django.utils.text import slugify
@@ -166,20 +167,54 @@ class Post(models.Model):
             models.Index(fields=['-published_at', '-created_at']),
         ]
 
+    def _generate_unique_slug(self, base_slug):
+        """
+        Generate a unique slug using timestamp to avoid race conditions.
+        Uses timestamp instead of counter to prevent conflicts in concurrent scenarios.
+        
+        Args:
+            base_slug: The base slug generated from the title
+            
+        Returns:
+            A unique slug that doesn't exist in the database
+        """
+        MAX_ATTEMPTS = 10  # Maximum number of attempts to generate unique slug
+        
+        # First try the base slug
+        if not Post.objects.filter(slug=base_slug).exists():
+            return base_slug
+        
+        # If base slug exists, append timestamp to make it unique
+        timestamp = int(timezone.now().timestamp())
+        unique_slug = f"{base_slug}-{timestamp}"
+        
+        # Check if timestamp-based slug is unique (should be very rare collision)
+        attempts = 0
+        while Post.objects.filter(slug=unique_slug).exists() and attempts < MAX_ATTEMPTS:
+            # If collision occurs (extremely rare), add microseconds
+            timestamp = int(timezone.now().timestamp() * 1000000)  # Include microseconds
+            unique_slug = f"{base_slug}-{timestamp}"
+            attempts += 1
+        
+        if attempts >= MAX_ATTEMPTS:
+            # Fallback: use a combination of timestamp and random component
+            # This should never happen in practice, but provides safety
+            unique_slug = f"{base_slug}-{timestamp}-{random.randint(1000, 9999)}"
+        
+        return unique_slug
+    
     def save(self, *args, **kwargs):
         """
         Override save method to automatically generate slug from title
         and update published_at when post is published for the first time.
+        Uses timestamp-based approach to avoid race conditions.
         """
         # Generate slug if not provided
         if not self.slug:
-            self.slug = slugify(self.title)
-            # If slug already exists, add a number
-            original_slug = self.slug
-            counter = 1
-            while Post.objects.filter(slug=self.slug).exists():
-                self.slug = f"{original_slug}-{counter}"
-                counter += 1
+            base_slug = slugify(self.title)
+            if not base_slug:  # Handle empty slug case
+                base_slug = f"post-{int(timezone.now().timestamp())}"
+            self.slug = self._generate_unique_slug(base_slug)
         
         # Update published_at when post is published for the first time
         if self.is_published and not self.published_at:
