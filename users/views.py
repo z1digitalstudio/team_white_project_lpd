@@ -22,7 +22,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
             return User.objects.all()
         return User.objects.filter(id=self.request.user.id)
     
-    @action(detail=False, methods=['post'], permission_classes=[permissions.AllowAny])
+    @action(detail=False, methods=['post', 'get'], permission_classes=[permissions.AllowAny], serializer_class=UserRegistrationSerializer)
     def register(self, request):
         """
         Register new users with automatic blog creation.
