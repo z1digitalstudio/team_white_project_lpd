@@ -26,16 +26,14 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     def register(self, request):
         """
         Register new users with automatic blog creation.
-        Blog title is provided in the registration data.
         """
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            # Create blog for new user with the provided title
-            blog_title = getattr(user, '_blog_title', f"Blog de {user.username}")
+            # Automatically create blog for new user
             Blog.objects.create(
                 user=user,
-                title=blog_title
+                title=f"Blog de {user.username}"
             )
             # Create token for user
             token, created = Token.objects.get_or_create(user=user)

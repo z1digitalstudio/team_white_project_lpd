@@ -39,13 +39,17 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     """
     password = serializers.CharField(
         write_only=True, 
+        required=True,
         min_length=8,
         max_length=128,
-        style={'input_type': 'password'}
+        style={'input_type': 'password'},
+        help_text="Password must be between 8 and 128 characters"
     )
     password_confirm = serializers.CharField(
         write_only=True,
-        style={'input_type': 'password'}
+        required=True,
+        style={'input_type': 'password'},
+        help_text="Confirm your password"
     )
     email = serializers.EmailField(
         required=True, 
@@ -70,9 +74,11 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         model = User
         fields = ['username', 'email', 'first_name', 'last_name', 'password', 'password_confirm']
         extra_kwargs = {
-            'username': {'min_length': 3, 'max_length': 30},
+            'username': {'min_length': 3, 'max_length': 30, 'required': True},
             'email': {'required': True},
-            'first_name': {'required': True}
+            'first_name': {'required': True},
+            'password': {'write_only': True, 'required': True},
+            'password_confirm': {'write_only': True, 'required': True}
         }
     
     def validate_username(self, value):
