@@ -27,9 +27,10 @@ class UserLoginSerializer(serializers.Serializer):
         else:
             raise serializers.ValidationError("Must provide username and password")
 
-class UserRegistrationSerializer(serializers.ModelSerializer):
+class UserRegistrationSerializer(serializers.Serializer):
     """
     Serializer for user registration with password confirmation.
+    Using Serializer instead of ModelSerializer to ensure all fields appear in HTML form.
     All fields have length validations:
     - Username: 3-30 characters (letters and numbers only)
     - Password: 8-128 characters
@@ -37,47 +38,49 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     - Last name: 2-150 characters (optional)
     - Email: 5-150 characters (required)
     """
-    password = serializers.CharField(
-        write_only=True, 
+    username = serializers.CharField(
         required=True,
-        min_length=8,
-        max_length=128,
-        style={'input_type': 'password'},
-        help_text="Password must be between 8 and 128 characters"
-    )
-    password_confirm = serializers.CharField(
-        write_only=True,
-        required=True,
-        style={'input_type': 'password'},
-        help_text="Confirm your password"
+        min_length=3,
+        max_length=30,
+        help_text="Username must be 3-30 characters, letters and numbers only"
     )
     email = serializers.EmailField(
         required=True, 
         allow_blank=False,
         min_length=5,
-        max_length=150
+        max_length=150,
+        help_text="Email address"
     )
     first_name = serializers.CharField(
         required=True, 
         allow_blank=False, 
         min_length=2,
-        max_length=150
+        max_length=150,
+        help_text="First name"
     )
     last_name = serializers.CharField(
         required=False,
         allow_blank=True,
         min_length=2,
-        max_length=150
+        max_length=150,
+        help_text="Last name (optional)"
     )
-    
-    class Meta:
-        model = User
-        fields = ['username', 'email', 'first_name', 'last_name', 'password', 'password_confirm']
-        extra_kwargs = {
-            'username': {'min_length': 3, 'max_length': 30, 'required': True},
-            'email': {'required': True},
-            'first_name': {'required': True}
-        }
+    password = serializers.CharField(
+        required=True,
+        allow_blank=False,
+        min_length=8,
+        max_length=128,
+        style={'input_type': 'password'},
+        help_text="Password must be between 8 and 128 characters",
+        label="Password"
+    )
+    password_confirm = serializers.CharField(
+        required=True,
+        allow_blank=False,
+        style={'input_type': 'password'},
+        help_text="Confirm your password",
+        label="Password confirmation"
+    )
     
     def validate_username(self, value):
         """
@@ -154,7 +157,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         # Remove password_confirm before creating user
-        validated_data.pop('password_confirm')
+        password_confirm = validated_data.pop('password_confirm')
         user = User.objects.create_user(**validated_data)
         return user
 
