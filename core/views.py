@@ -1,6 +1,6 @@
 # core/views.py
 from rest_framework import viewsets, permissions, status
-from rest_framework.decorators import action, api_view
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.authtoken.models import Token
@@ -12,7 +12,7 @@ from .serializers import (
     UserSerializer, BlogSerializer, PostSerializer, 
     PostCreateSerializer, TagSerializer, UserRegistrationSerializer, UserLoginSerializer
 )
-from .permissions import IsOwnerOrSuperuser, IsOwnerOrSuperuserForBlog, IsSuperuserOrReadOnly
+from .permissions import HasPostPermission, HasBlogPermission, IsSuperuserOrReadOnly
 from .constants import (
     USER_REGISTERED_SUCCESS,
     LOGIN_SUCCESS,
@@ -88,7 +88,7 @@ class BlogViewSet(viewsets.ModelViewSet):
     ViewSet for blog management with owner-based permissions.
     """
     serializer_class = BlogSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrSuperuserForBlog]
+    permission_classes = [permissions.IsAuthenticated, HasBlogPermission]
     
     def get_queryset(self):
         # Superusers can see all blogs, others only their own
@@ -134,7 +134,7 @@ class PostViewSet(viewsets.ModelViewSet):
     ViewSet for post management with custom permissions and actions.
     Posts are paginated with 5 items per page.
     """
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrSuperuser]
+    permission_classes = [permissions.IsAuthenticated, HasPostPermission]
     pagination_class = PostPagination
     
     def get_queryset(self):
@@ -176,13 +176,29 @@ class PostViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def by_tag(self, request):
         """
-        Endpoint to filter posts by tag name (paginated, 5 per page).
+        Endpoint to filter posts by tag name or ID (paginated, 5 per page).
+        Accepts either tag name or tag ID as query parameter.
         """
-        tag_name = request.query_params.get('tag', None)
-        if tag_name:
-            posts = self.get_queryset().filter(tags__name__icontains=tag_name)
+        tag_param = request.query_params.get('tag', None)
+        queryset = self.get_queryset()
+        
+        if tag_param:
+            tag_param = tag_param.strip()  # Remove whitespace
+            # Try to filter by ID first (if it's a number)
+            try:
+                tag_id = int(tag_param)
+                posts = queryset.filter(tags__id=tag_id).distinct()
+            except ValueError:
+                # If not a number, filter by name (case-insensitive, exact match first)
+                # Try exact match first
+                exact_posts = queryset.filter(tags__name__iexact=tag_param).distinct()
+                if exact_posts.exists():
+                    posts = exact_posts
+                else:
+                    # Fall back to contains if no exact match
+                    posts = queryset.filter(tags__name__icontains=tag_param).distinct()
         else:
-            posts = self.get_queryset()
+            posts = queryset
         
         page = self.paginate_queryset(posts)
         if page is not None:
@@ -190,15 +206,3 @@ class PostViewSet(viewsets.ModelViewSet):
             return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(posts, many=True)
         return Response(serializer.data)
-
-@api_view(['GET'])
-def api_root(request):
-    """
-    API Root view that shows all available endpoints.
-    """
-    return Response({
-        'users': request.build_absolute_uri(reverse('user-list')),
-        'blogs': request.build_absolute_uri(reverse('blog-list')),
-        'posts': request.build_absolute_uri(reverse('post-list')),
-        'tags': request.build_absolute_uri(reverse('tag-list')),
-    })
