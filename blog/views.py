@@ -82,7 +82,8 @@ class PostViewSet(viewsets.ModelViewSet):
             # Create blog automatically if it doesn't exist
             blog = Blog.objects.create(
                 user=self.request.user,
-                title=f"Blog de {self.request.user.username}"
+                title=f"Blog de {self.request.user.username}",
+                bio=f"Blog personal de {self.request.user.username}"
             )
             serializer.save(blog=blog)
     

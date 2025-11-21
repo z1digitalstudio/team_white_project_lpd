@@ -9,6 +9,7 @@ class BlogSerializer(serializers.ModelSerializer):
     Serializer for blog data with nested user information.
     """
     user = UserSerializer(read_only=True)
+    bio = serializers.CharField(required=True, allow_blank=False, min_length=1)
     
     class Meta:
         model = Blog

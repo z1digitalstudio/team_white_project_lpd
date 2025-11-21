@@ -33,7 +33,8 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
             # Automatically create blog for new user
             Blog.objects.create(
                 user=user,
-                title=f"Blog de {user.username}"
+                title=f"Blog de {user.username}",
+                bio=f"Blog personal de {user.username}"
             )
             # Create token for user
             token, created = Token.objects.get_or_create(user=user)
