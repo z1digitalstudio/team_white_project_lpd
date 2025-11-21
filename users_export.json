@@ -1,0 +1,57 @@
+[
+  {
+    "username": "luisparadela",
+    "email": "luisparadela@z1.digital",
+    "first_name": "",
+    "last_name": "",
+    "is_staff": true,
+    "is_superuser": true,
+    "is_active": true,
+    "date_joined": "2025-10-17T09:23:14.245665+00:00",
+    "password": "pbkdf2_sha256$1000000$QLyfrEIlIbAl7gTB4lgKta$5ysmZFlN2R5TYe+cCt3SRei8su0GaThybyJzDa9jZ4Q="
+  },
+  {
+    "username": "kapil",
+    "email": "",
+    "first_name": "",
+    "last_name": "",
+    "is_staff": true,
+    "is_superuser": false,
+    "is_active": true,
+    "date_joined": "2025-10-17T10:02:04+00:00",
+    "password": "pbkdf2_sha256$1000000$h7SSIZbd5MXN7UIyS6nKdV$aOm5uh9HUSgznRiWhKlEjyiojM7zfkjO7VKH81oiZ2o="
+  },
+  {
+    "username": "luis",
+    "email": "luis@luis.com",
+    "first_name": "luis",
+    "last_name": "luis",
+    "is_staff": false,
+    "is_superuser": false,
+    "is_active": true,
+    "date_joined": "2025-10-21T12:13:16.843541+00:00",
+    "password": "pbkdf2_sha256$1000000$tKD5kVxJOKIWMnNNloWc9S$ug34Yo5d1VDfDT8aAgn5linfjSFP+HUCVh2T+v3yb9Y="
+  },
+  {
+    "username": "testuser",
+    "email": "test@example.com",
+    "first_name": "Test",
+    "last_name": "User",
+    "is_staff": false,
+    "is_superuser": false,
+    "is_active": true,
+    "date_joined": "2025-10-21T12:41:18.606820+00:00",
+    "password": "pbkdf2_sha256$1000000$Gm5PdUPdHRHUkiLFzJz9Bd$k9wMlpw6aOyIw/GL+vOBFQgf5KfgU4Ky77t4W2vsgwY="
+  },
+  {
+    "username": "luis1",
+    "email": "user2@example.com",
+    "first_name": "Luis",
+    "last_name": "Paradela",
+    "is_staff": false,
+    "is_superuser": false,
+    "is_active": true,
+    "date_joined": "2025-10-22T10:31:56.797413+00:00",
+    "password": "pbkdf2_sha256$1000000$mHJ2EljbgDGZDwpuH5aUnc$X6GuvY6GjjcYQshMxNQLM1Of38QDySV9lR3fMhb4K+s="
+  }
+]

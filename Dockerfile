@@ -35,4 +35,4 @@ RUN mkdir -p /tmp /var/tmp /usr/tmp && \
 EXPOSE 8000
 
 # Comando para ejecutar la aplicación
-CMD ["sh", "-c", "python manage.py migrate --noinput && python manage.py collectstatic --noinput && python manage.py create_superuser_if_not_exists --noinput --username admin --email admin@z1.digital --password z1digital || true && gunicorn config.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 3"]
+CMD ["sh", "-c", "python manage.py migrate --noinput && python manage.py collectstatic --noinput && python manage.py import_users || python create_admin.py || true && gunicorn config.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 3"]
