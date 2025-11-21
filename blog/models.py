@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils.text import slugify
+from django.utils import timezone
 from tinymce.models import HTMLField
 
 User = settings.AUTH_USER_MODEL
@@ -12,7 +13,7 @@ class Blog(models.Model):
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='blog')
     title = models.CharField(max_length=200)
-    bio = models.TextField(blank=True)
+    bio = models.TextField(blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -45,9 +46,11 @@ class Post(models.Model):
 
     def save(self, *args, **kwargs):
         """
-        Override save method to automatically generate slug from title.
+        Override save method to automatically generate slug from title
+        and set published_at when post is published for the first time.
         If slug already exists, append a number to make it unique.
         """
+        # Generate slug if not provided
         if not self.slug:
             self.slug = slugify(self.title)
             # If slug already exists, add a number
@@ -56,6 +59,11 @@ class Post(models.Model):
             while Post.objects.filter(slug=self.slug).exists():
                 self.slug = f"{original_slug}-{counter}"
                 counter += 1
+        
+        # Set published_at when post is published for the first time
+        if self.is_published and not self.published_at:
+            self.published_at = timezone.now()
+        
         super().save(*args, **kwargs)
 
     def __str__(self):

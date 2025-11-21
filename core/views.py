@@ -1,6 +1,6 @@
 # core/views.py
 from rest_framework import viewsets, permissions, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.authtoken.models import Token
@@ -56,7 +56,8 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
             # Automatically create blog for new user
             Blog.objects.create(
                 user=user,
-                title=BLOG_TITLE_TEMPLATE.format(username=user.username)
+                title=BLOG_TITLE_TEMPLATE.format(username=user.username),
+                bio=f"Blog personal de {user.username}"
             )
             # Create token for user
             token, created = Token.objects.get_or_create(user=user)
@@ -156,7 +157,8 @@ class PostViewSet(viewsets.ModelViewSet):
             # Create blog automatically if it doesn't exist
             blog = Blog.objects.create(
                 user=self.request.user,
-                title=BLOG_TITLE_TEMPLATE.format(username=self.request.user.username)
+                title=BLOG_TITLE_TEMPLATE.format(username=self.request.user.username),
+                bio=f"Blog personal de {self.request.user.username}"
             )
             serializer.save(blog=blog)
     
@@ -206,3 +208,15 @@ class PostViewSet(viewsets.ModelViewSet):
             return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(posts, many=True)
         return Response(serializer.data)
+
+@api_view(['GET'])
+def api_root(request):
+    """
+    API Root view that shows all available endpoints.
+    """
+    return Response({
+        'users': request.build_absolute_uri(reverse('user-list')),
+        'blogs': request.build_absolute_uri(reverse('blog-list')),
+        'posts': request.build_absolute_uri(reverse('post-list')),
+        'tags': request.build_absolute_uri(reverse('tag-list')),
+    })
