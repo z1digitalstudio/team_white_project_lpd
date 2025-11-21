@@ -20,11 +20,9 @@ password = 'z1digital'
 
 # Eliminar usuario 'adm' si existe
 User.objects.filter(username='adm').delete()
-print(f"Usuario 'adm' eliminado si existía")
 
 # Eliminar usuario 'admin' si existe (para recrearlo con nueva contraseña)
 User.objects.filter(username=username).delete()
-print(f"Usuario '{username}' eliminado si existía")
 
 # Crear nuevo superusuario
 user = User.objects.create_superuser(
@@ -32,7 +30,5 @@ user = User.objects.create_superuser(
     email=email,
     password=password
 )
-print(f"✅ Superusuario '{username}' creado exitosamente!")
-print(f"   Email: {email}")
-print(f"   Password: {password}")
+# Silencioso - no mostrar logs
 

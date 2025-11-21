@@ -17,17 +17,11 @@ class Command(BaseCommand):
         input_file = 'users_export.json'
         
         if not os.path.exists(input_file):
-            self.stdout.write(
-                self.style.ERROR(f'File {input_file} not found')
-            )
+            # Silencioso - no mostrar error si el archivo no existe
             return
-
-        self.stdout.write(f'Reading users from {input_file}...')
 
         with open(input_file, 'r') as f:
             users_data = json.load(f)
-
-        self.stdout.write(f'Importing {len(users_data)} user(s) to Postgres...')
 
         imported = 0
         updated = 0
@@ -48,10 +42,6 @@ class Command(BaseCommand):
                 user.is_active = user_data.get('is_active', True)
                 user.password = user_data['password']  # Mantener el hash original
                 user.save()
-                
-                self.stdout.write(
-                    self.style.SUCCESS(f'  ✓ User updated: {username} (superuser: {user.is_superuser})')
-                )
                 updated += 1
                 
             except User.DoesNotExist:
@@ -70,15 +60,7 @@ class Command(BaseCommand):
                 user.is_active = user_data.get('is_active', True)
                 user.password = user_data['password']  # Asignar el hash directamente
                 user.save()
-                
-                self.stdout.write(
-                    self.style.SUCCESS(f'  ✓ User created: {username} (superuser: {user.is_superuser})')
-                )
                 imported += 1
 
-        self.stdout.write(
-            self.style.SUCCESS(
-                f'\n✅ Import completed:\n   - Created: {imported}\n   - Updated: {updated}\n   - Total: {imported + updated}'
-            )
-        )
+        # Silencioso - no mostrar logs
 
