@@ -11,7 +11,7 @@ from .serializers import (
     UserSerializer, BlogSerializer, PostSerializer, 
     PostCreateSerializer, TagSerializer, UserRegistrationSerializer, UserLoginSerializer
 )
-from .permissions import HasPostPermission, HasBlogPermission, IsSuperuserOrReadOnly
+from .permissions import HasPostPermission, HasBlogPermission, IsSuperuserOrReadOnly, IsNotAuthenticated
 from .constants import (
     USER_REGISTERED_SUCCESS,
     LOGIN_SUCCESS,
@@ -44,7 +44,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
             return User.objects.all()
         return User.objects.filter(id=self.request.user.id)
     
-    @action(detail=False, methods=['post'], permission_classes=[permissions.AllowAny])
+    @action(detail=False, methods=['post'], permission_classes=[IsNotAuthenticated])
     def register(self, request):
         """
         Register new users with automatic blog creation.
@@ -67,7 +67,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    @action(detail=False, methods=['post'], permission_classes=[permissions.AllowAny])
+    @action(detail=False, methods=['post'], permission_classes=[IsNotAuthenticated])
     def login(self, request):
         """
         User login with token generation.

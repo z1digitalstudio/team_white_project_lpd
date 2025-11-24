@@ -28,3 +28,14 @@ class IsSuperuserOrReadOnly(permissions.BasePermission):
         
         return False
 
+
+class IsNotAuthenticated(permissions.BasePermission):
+    """
+    Permission to allow access only to unauthenticated users.
+    Used for registration and login endpoints.
+    """
+    
+    def has_permission(self, request, view):
+        """Only allow access if user is NOT authenticated"""
+        return not request.user.is_authenticated
+
