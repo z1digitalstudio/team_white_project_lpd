@@ -73,19 +73,40 @@ class PostViewSet(viewsets.ModelViewSet):
             return PostCreateSerializer
         return PostSerializer
     
-    def perform_create(self, serializer):
-        # Automatically assign user's blog to post
-        user_blog = Blog.objects.filter(user=self.request.user).first()
-        if user_blog:
-            serializer.save(blog=user_blog)
-        else:
-            # Create blog automatically if it doesn't exist
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        user_blog = Blog.objects.filter(user=request.user).first()
+        if not user_blog:
             blog = Blog.objects.create(
-                user=self.request.user,
-                title=f"Blog de {self.request.user.username}",
-                bio=f"Blog personal de {self.request.user.username}"
+                user=request.user,
+                title=f"Blog de {request.user.username}",
+                bio=f"Blog personal de {request.user.username}"
             )
-            serializer.save(blog=blog)
+            user_blog = blog
+        
+        post = serializer.save(blog=user_blog)
+        
+        # Return response using PostSerializer to show tag names
+        response_serializer = PostSerializer(post)
+        headers = self.get_success_headers(response_serializer.data)
+        return Response(response_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        post = serializer.save()
+        
+        # Return response using PostSerializer to show tag names
+        response_serializer = PostSerializer(post)
+        return Response(response_serializer.data)
+    
+    def perform_create(self, serializer):
+        # This method is no longer used, but kept for compatibility
+        pass
     
     @action(detail=False, methods=['get'])
     def published(self, request):

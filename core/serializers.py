@@ -107,7 +107,7 @@ class PostSerializer(serializers.ModelSerializer):
     Serializer for post data with nested blog and tags information.
     """
     blog = BlogSerializer(read_only=True)
-    tags = TagSerializer(many=True, read_only=True)
+    tags = serializers.SerializerMethodField()
     
     class Meta:
         model = Post
@@ -117,6 +117,10 @@ class PostSerializer(serializers.ModelSerializer):
             'updated_at', 'published_at', 'blog'
         ]
         read_only_fields = ['slug', 'created_at', 'updated_at']
+    
+    def get_tags(self, obj):
+        """Return list of tag names instead of full tag objects"""
+        return [tag.name for tag in obj.tags.all()]
 
 class PostCreateSerializer(serializers.ModelSerializer):
     """
