@@ -16,7 +16,7 @@ def api_root(request):
     Public endpoint - no authentication required.
     """
     base_url = request.build_absolute_uri('/api')
-    return Response({
+    response_data = {
         'message': 'Welcome to the Blog CMS API',
         'version': '1.0.0',
         'endpoints': {
@@ -25,16 +25,21 @@ def api_root(request):
             'posts': f"{base_url}/posts/",
             'tags': f"{base_url}/tags/",
         },
-        'authentication': {
-            'register': f"{base_url}/users/register/",
-            'login': f"{base_url}/users/login/",
-        },
         'documentation': {
             'swagger': request.build_absolute_uri('/swagger/'),
             'redoc': request.build_absolute_uri('/redoc/'),
             'schema': f"{base_url}/schema/",
         }
-    })
+    }
+    
+    # Only show authentication endpoints if user is not authenticated
+    if not request.user.is_authenticated:
+        response_data['authentication'] = {
+            'register': f"{base_url}/users/register/",
+            'login': f"{base_url}/users/login/",
+        }
+    
+    return Response(response_data)
 
 
 urlpatterns = [
