@@ -18,7 +18,7 @@ class Blog(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-created_at']  # Ordenar por fecha de creación descendente
+        ordering = ['-created_at']
 
     def __str__(self):
         return f"{self.title} ({self.user.username})"
@@ -42,7 +42,7 @@ class Post(models.Model):
     published_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        ordering = ['-published_at', '-created_at']  # Ordenar por fecha de publicación
+        ordering = ['-published_at', '-created_at']
 
     def save(self, *args, **kwargs):
         """

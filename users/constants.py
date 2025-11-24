@@ -33,7 +33,6 @@ ERROR_PASSWORDS_DO_NOT_MATCH = "Passwords do not match"
 MESSAGE_USER_REGISTERED = "User registered successfully"
 MESSAGE_LOGIN_SUCCESSFUL = "Login successful"
 
-# Blog errors (from core/views.py)
+# Blog errors
 ERROR_USER_ALREADY_HAS_BLOG = "User already has a blog"
 MESSAGE_USER_ALREADY_HAS_BLOG = "Each user can only have one blog. Use PUT or PATCH to update your existing blog."
-

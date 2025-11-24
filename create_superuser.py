@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 """
-Script para crear un superusuario en Django.
-Ejecutar con: python create_superuser.py
+Script to create a superuser in Django.
+Run with: python create_superuser.py
 """
 import os
 import django
 
-# Configurar Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
 

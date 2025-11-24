@@ -40,7 +40,7 @@ class Blog(models.Model):
     )
 
     class Meta:
-        ordering = ['-created_at']  # Ordenar por fecha de creación descendente
+        ordering = ['-created_at']
         indexes = [
             models.Index(fields=['user']),
             models.Index(fields=['-created_at']),
@@ -73,7 +73,7 @@ class Tag(models.Model):
     )
 
     class Meta:
-        ordering = ['-created_at', 'name']  # Ordenar por fecha de creación descendente y nombre alfabéticamente
+        ordering = ['-created_at', 'name']
         indexes = [
             models.Index(fields=['name']),
             models.Index(fields=['-created_at', 'name']),
@@ -159,7 +159,7 @@ class Post(models.Model):
     )
 
     class Meta:
-        ordering = ['-published_at', '-created_at']  # Ordenar por fecha de publicación
+        ordering = ['-published_at', '-created_at']
         indexes = [
             models.Index(fields=['blog']),
             models.Index(fields=['is_published']),

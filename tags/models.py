@@ -11,7 +11,7 @@ class Tag(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-created_at', 'name']  # Ordenar por fecha de creación descendente y nombre alfabéticamente
+        ordering = ['-created_at', 'name']
 
     def __str__(self):
         return self.name
