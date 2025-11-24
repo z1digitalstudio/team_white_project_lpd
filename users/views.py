@@ -5,7 +5,7 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
 from blog.models import Blog
 from .serializers import UserSerializer, UserRegistrationSerializer, UserLoginSerializer
-from .permissions import IsSuperuserOrReadOnly
+from .permissions import IsSuperuserOrReadOnly, IsNotAuthenticated
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -22,7 +22,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
             return User.objects.all()
         return User.objects.filter(id=self.request.user.id)
     
-    @action(detail=False, methods=['post', 'get'], permission_classes=[permissions.AllowAny], serializer_class=UserRegistrationSerializer)
+    @action(detail=False, methods=['post', 'get'], permission_classes=[IsNotAuthenticated], serializer_class=UserRegistrationSerializer)
     def register(self, request):
         """
         Register new users with automatic blog creation.
@@ -45,7 +45,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    @action(detail=False, methods=['post'], permission_classes=[permissions.AllowAny])
+    @action(detail=False, methods=['post'], permission_classes=[IsNotAuthenticated])
     def login(self, request):
         """
         User login with token generation.

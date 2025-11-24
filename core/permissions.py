@@ -1,6 +1,7 @@
 from rest_framework import permissions
 
 
+
 class BaseOwnerPermission(permissions.BasePermission):
     """
     Base permission class for owner-based permissions.
@@ -86,3 +87,14 @@ class IsSuperuserOrReadOnly(permissions.BasePermission):
             return request.user.is_authenticated
         
         return False
+
+
+class IsNotAuthenticated(permissions.BasePermission):
+    """
+    Permission to allow access only to unauthenticated users.
+    Used for registration and login endpoints.
+    """
+    
+    def has_permission(self, request, view):
+        """Only allow access if user is NOT authenticated"""
+        return not request.user.is_authenticated
