@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'graphene_django',
     'users',
     'blog',
     'tags',
@@ -233,5 +234,13 @@ SPECTACULAR_SETTINGS = {
     'SCHEMA_PATH_PREFIX': '/api/',
     'AUTHENTICATION_WHITELIST': [
         'rest_framework.authentication.TokenAuthentication',
+    ],
+}
+
+# GraphQL Configuration
+GRAPHENE = {
+    'SCHEMA': 'core.schema.schema',
+    'MIDDLEWARE': [
+        'graphene_django.debug.DjangoDebugMiddleware',
     ],
 }
