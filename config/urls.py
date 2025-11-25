@@ -32,6 +32,7 @@ def api_root(request):
             'swagger': request.build_absolute_uri('/swagger/'),
             'redoc': request.build_absolute_uri('/redoc/'),
             'schema': f"{base_url}/schema/",
+            'graphql': request.build_absolute_uri('/graphql'),
         }
     }
     
@@ -59,7 +60,8 @@ urlpatterns = [
     path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     
     # GraphQL
-    path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True, schema=schema)), name='graphql'),
+    path('graphql', csrf_exempt(GraphQLView.as_view(graphiql=True, schema=schema)), name='graphql'),
+    path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True, schema=schema)), name='graphql-slash'),
 ]
 
 if settings.DEBUG:
